@@ -22,7 +22,28 @@ const photos = [
   }
 ]
 
-const profileImage = '/images/barrett-palmer.jpg'
+const fallbackProfileImage =
+  'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80'
+const localProfileImage = '/images/barrett-palmer.jpg'
+const profileImage = ref(fallbackProfileImage)
+
+const promoteLocalProfileImage = () => {
+  if (profileImage.value !== localProfileImage) {
+    profileImage.value = localProfileImage
+  }
+}
+
+if (process.client) {
+  const tester = new Image()
+  tester.src = localProfileImage
+  tester.onload = () => {
+    promoteLocalProfileImage()
+  }
+}
+
+const onProfileImageError = () => {
+  profileImage.value = fallbackProfileImage
+}
 </script>
 
 <template>
@@ -33,6 +54,7 @@ const profileImage = '/images/barrett-palmer.jpg'
           :src="profileImage"
           alt="Barrett Palmer"
           class="h-full w-full object-cover"
+          @error="onProfileImageError"
         >
       </div>
 
@@ -64,6 +86,7 @@ const profileImage = '/images/barrett-palmer.jpg'
               :src="profileImage"
               alt="Barrett Palmer"
               class="h-14 w-14 flex-none rounded-full object-cover"
+              @error="onProfileImageError"
             >
             <div>
               <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -170,6 +193,7 @@ const profileImage = '/images/barrett-palmer.jpg'
               :src="profileImage"
               alt="Barrett Palmer"
               class="h-full w-full object-cover"
+              @error="onProfileImageError"
             >
           </div>
 
