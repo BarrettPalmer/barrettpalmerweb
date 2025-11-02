@@ -1,5 +1,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics'
+import { getFirestore, type Firestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyB7wxYQh9ShIT4GohyYfc7Tw0fCReRemdY',
@@ -13,6 +14,7 @@ const firebaseConfig = {
 
 let app: FirebaseApp
 let analytics: Analytics | null = null
+let firestore: Firestore | null = null
 
 export default defineNuxtPlugin(async () => {
   app = getApps().length ? getApp() : initializeApp(firebaseConfig)
@@ -21,10 +23,13 @@ export default defineNuxtPlugin(async () => {
     analytics = getAnalytics(app)
   }
 
+  firestore = getFirestore(app)
+
   return {
     provide: {
       firebaseApp: app,
-      firebaseAnalytics: analytics
+      firebaseAnalytics: analytics,
+      firebaseFirestore: firestore
     }
   }
 })

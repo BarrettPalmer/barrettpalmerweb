@@ -1,55 +1,180 @@
 <script setup lang="ts">
-const featured = {
-  title: 'Shipping secure systems without shipping fear',
-  date: 'Dec 12, 2024',
-  readTime: '9 min read',
-  excerpt: 'Patterns I lean on at EntrustMyLife to keep iOS, Android, and web teams confident while hardening their platforms.',
-  link: '#'
+import { collection, getDocs, orderBy, query, Timestamp } from 'firebase/firestore'
+
+interface ArticleCard {
+  id: string
+  title: string
+  dateLabel: string
+  readTime: string
+  excerpt: string
+  tags: string[]
+  link: string
+  featured?: boolean
 }
 
-const articles = [
+const fallbackArticles: ArticleCard[] = [
   {
+    id: 'fallback-featured',
+    title: 'Shipping secure systems without shipping fear',
+    dateLabel: 'Dec 12, 2024',
+    readTime: '9 min read',
+    excerpt: 'Patterns I lean on at EntrustMyLife to keep iOS, Android, and web teams confident while hardening their platforms.',
+    tags: ['Security', 'Leadership'],
+    link: '#',
+    featured: true
+  },
+  {
+    id: 'fallback-1',
     title: 'What Amazon FBA taught me about velocity',
-    date: 'Oct 25, 2024',
+    dateLabel: 'Oct 25, 2024',
     readTime: '6 min read',
     excerpt: 'The Squeeze Bras launch hit #1 fast, but the real lesson was codifying ops in automation-friendly playbooks.',
-    tags: ['Growth', 'Automation']
+    tags: ['Growth', 'Automation'],
+    link: '#'
   },
   {
+    id: 'fallback-2',
     title: 'Choosing Firebase when security matters',
-    date: 'Aug 18, 2024',
+    dateLabel: 'Aug 18, 2024',
     readTime: '7 min read',
     excerpt: 'Why I back Google Cloud and Firebase for reliability, and where I draw the line compared to AWS.',
-    tags: ['Security', 'Architecture']
+    tags: ['Security', 'Architecture'],
+    link: '#'
   },
   {
+    id: 'fallback-3',
     title: 'Leading from the console',
-    date: 'May 9, 2024',
+    dateLabel: 'May 9, 2024',
     readTime: '8 min read',
     excerpt: 'Book two in progress: frameworks for leaders who need to stay hands-on with their code and their teams.',
-    tags: ['Leadership']
+    tags: ['Leadership'],
+    link: '#'
   },
   {
+    id: 'fallback-4',
     title: 'Designing with the Composition API',
-    date: 'Mar 14, 2024',
+    dateLabel: 'Mar 14, 2024',
     readTime: '5 min read',
     excerpt: 'How Nuxt’s Composition API keeps my components honest and testable—even when the stack spans multiple apps.',
-    tags: ['Nuxt.js', 'Engineering']
+    tags: ['Nuxt.js', 'Engineering'],
+    link: '#'
   }
 ]
+
+const defaultFeatured = fallbackArticles[0]
+const defaultList = fallbackArticles.slice(1)
+
+const { $firebaseFirestore } = useNuxtApp()
+
+const formatDate = (value: Date | string | null | undefined) => {
+  if (!value) return ''
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return typeof value === 'string' ? value : ''
+  }
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date)
+}
+
+const { data: articlesData, pending, error } = await useAsyncData(
+  'firestore-articles',
+  async () => {
+    if (!$firebaseFirestore) {
+      return {
+        featured: defaultFeatured,
+        articles: defaultList
+      }
+    }
+
+    try {
+      const snapshot = await getDocs(
+        query(collection($firebaseFirestore, 'articles'), orderBy('publishedAt', 'desc'))
+      )
+
+      if (snapshot.empty) {
+        return {
+          featured: defaultFeatured,
+          articles: defaultList
+        }
+      }
+
+      const mapped = snapshot.docs.map<ArticleCard>((doc) => {
+        const data = doc.data()
+        const publishedAtRaw = data.publishedAt
+        const publishedAt =
+          publishedAtRaw instanceof Timestamp
+            ? publishedAtRaw.toDate()
+            : typeof publishedAtRaw === 'number'
+              ? new Date(publishedAtRaw)
+              : publishedAtRaw
+
+        const readMinutes = data.readMinutes ?? data.readTime ?? 6
+        const link =
+          data.link ??
+          (data.slug ? `/articles/${data.slug}` : data.slug === undefined ? '#' : String(data.slug))
+
+        return {
+          id: doc.id,
+          title: data.title ?? 'Untitled article',
+          dateLabel: formatDate(publishedAt) || 'TBD',
+          readTime: typeof readMinutes === 'number' ? `${readMinutes} min read` : String(readMinutes),
+          excerpt: data.excerpt ?? 'Summary coming soon.',
+          tags: Array.isArray(data.tags) ? data.tags : [],
+          link,
+          featured: Boolean(data.featured)
+        }
+      })
+
+      const featuredArticle = mapped.find((item) => item.featured) ?? mapped[0]
+      const remaining = mapped.filter((item) => item.id !== featuredArticle.id)
+
+      return {
+        featured: featuredArticle,
+        articles: remaining
+      }
+    } catch (err) {
+      console.warn('[articles] Firestore fetch failed, falling back to static content.', err)
+      return {
+        featured: defaultFeatured,
+        articles: defaultList
+      }
+    }
+  },
+  {
+    server: false,
+    default: () => ({
+      featured: defaultFeatured,
+      articles: defaultList
+    })
+  }
+)
+
+const featuredArticle = computed(() => articlesData.value?.featured ?? defaultFeatured)
+const otherArticles = computed(() => articlesData.value?.articles ?? defaultList)
+const isLoading = computed(() => pending.value)
+const hasError = computed(() => Boolean(error.value))
 </script>
 
 <template>
   <div class="space-y-16">
     <section class="rounded-[2.75rem] border border-white/60 bg-white/85 p-10 shadow-soft backdrop-blur-xl lg:p-14">
       <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div>
+        <div class="space-y-3">
           <p class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
             Writing
           </p>
           <h1 class="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
             Notes on security-led engineering, leadership, and the build-up of EntrustMyLife.
           </h1>
+          <p
+            v-if="hasError"
+            class="text-xs font-medium uppercase tracking-[0.25em] text-amber-600"
+          >
+            Offline mode — showing fallback articles
+          </p>
         </div>
         <NuxtLink
           to="mailto:hello@barrettpalmer.com"
@@ -62,23 +187,36 @@ const articles = [
         </NuxtLink>
       </div>
 
-      <article class="mt-10 rounded-[2.5rem] border border-slate-200/70 bg-white p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+      <article
+        class="mt-10 rounded-[2.5rem] border border-slate-200/70 bg-white p-8 shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition duration-200"
+        :aria-busy="isLoading"
+      >
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
             Featured
           </span>
           <span class="text-sm text-slate-500">
-            {{ featured.date }} · {{ featured.readTime }}
+            <span v-if="isLoading">Loading…</span>
+            <template v-else>
+              {{ featuredArticle.dateLabel }} · {{ featuredArticle.readTime }}
+            </template>
           </span>
         </div>
         <h2 class="mt-4 text-2xl font-semibold text-slate-900">
-          {{ featured.title }}
+          <span v-if="isLoading" class="block h-7 w-3/4 animate-pulse rounded-full bg-slate-200" />
+          <template v-else>
+            {{ featuredArticle.title }}
+          </template>
         </h2>
         <p class="mt-3 text-base leading-7 text-slate-600">
-          {{ featured.excerpt }}
+          <span v-if="isLoading" class="block h-5 w-full animate-pulse rounded-full bg-slate-200" />
+          <span v-if="isLoading" class="mt-2 block h-5 w-5/6 animate-pulse rounded-full bg-slate-200" />
+          <template v-else>
+            {{ featuredArticle.excerpt }}
+          </template>
         </p>
         <NuxtLink
-          :to="featured.link"
+          :to="isLoading ? '#' : featuredArticle.link || '#'"
           class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:gap-3"
         >
           Read the story
@@ -91,16 +229,33 @@ const articles = [
 
     <section class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
       <article
-        v-for="article in articles"
-        :key="article.title"
+        v-if="isLoading"
         class="rounded-[2rem] border border-white/60 bg-white/80 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur"
       >
         <div class="flex items-center justify-between text-xs text-slate-400">
-          <span class="font-semibold uppercase tracking-[0.3em]">{{ article.date }}</span>
+          <span class="block h-4 w-1/3 animate-pulse rounded-full bg-slate-200" />
+          <span class="block h-4 w-16 animate-pulse rounded-full bg-slate-200" />
+        </div>
+        <div class="mt-4 h-6 w-3/4 animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-3 h-4 w-full animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-2 h-4 w-5/6 animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-4 flex gap-2">
+          <span class="block h-6 w-16 animate-pulse rounded-full bg-slate-200" />
+          <span class="block h-6 w-20 animate-pulse rounded-full bg-slate-200" />
+        </div>
+      </article>
+
+      <article
+        v-for="article in otherArticles"
+        :key="article.id"
+        class="rounded-[2rem] border border-white/60 bg-white/80 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur"
+      >
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span class="font-semibold uppercase tracking-[0.3em]">{{ article.dateLabel }}</span>
           <span class="text-slate-500">{{ article.readTime }}</span>
         </div>
         <h3 class="mt-4 text-xl font-semibold text-slate-900">
-          <NuxtLink :to="'#'">
+          <NuxtLink :to="article.link || '#'">
             {{ article.title }}
           </NuxtLink>
         </h3>

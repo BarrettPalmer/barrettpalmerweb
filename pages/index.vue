@@ -21,6 +21,8 @@ const photos = [
     alt: 'Mars-like desert canyon'
   }
 ]
+
+const profileImage = '/images/barrett-palmer.jpg'
 </script>
 
 <template>
@@ -28,8 +30,8 @@ const photos = [
     <article class="relative rounded-[2.75rem] border border-white/60 bg-white/80 p-10 shadow-soft backdrop-blur-xl lg:p-12">
       <div class="absolute -top-6 left-8 hidden h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg lg:block">
         <img
-          src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
-          alt="Portrait of Barrett Palmer"
+          :src="profileImage"
+          alt="Barrett Palmer"
           class="h-full w-full object-cover"
         >
       </div>
@@ -59,8 +61,8 @@ const photos = [
 
           <div class="flex items-start gap-5 lg:hidden">
             <img
-              src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
-              alt="Portrait of Barrett Palmer"
+              :src="profileImage"
+              alt="Barrett Palmer"
               class="h-14 w-14 flex-none rounded-full object-cover"
             >
             <div>
@@ -165,8 +167,8 @@ const photos = [
         <div class="mt-8 flex flex-col gap-6 text-center text-slate-600">
           <div class="mx-auto h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
-              alt="Portrait of Barrett Palmer"
+              :src="profileImage"
+              alt="Barrett Palmer"
               class="h-full w-full object-cover"
             >
           </div>
