@@ -79,7 +79,7 @@ const formatDate = (value: Date | string | null | undefined) => {
   }).format(date)
 }
 
-const { data: articlesData, pending, error } = await useAsyncData(
+const { data: articlesData, pending, error } = useAsyncData(
   'firestore-articles',
   async () => {
     if (!$firebaseFirestore) {
