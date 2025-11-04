@@ -79,83 +79,72 @@ const formatDate = (value: Date | string | null | undefined) => {
   }).format(date)
 }
 
-const { data: articlesData, pending, error } = useAsyncData(
-  'firestore-articles',
-  async () => {
-    if (!$firebaseFirestore) {
-      return {
-        featured: defaultFeatured,
-        articles: defaultList
-      }
-    }
+const featuredArticle = ref<ArticleCard>(defaultFeatured)
+const otherArticles = ref<ArticleCard[]>(defaultList)
+const isLoading = ref(true)
+const hasError = ref(false)
 
-    try {
-      const snapshot = await getDocs(
-        query(collection($firebaseFirestore, 'articles'), orderBy('publishedAt', 'desc'))
-      )
-
-      if (snapshot.empty) {
-        return {
-          featured: defaultFeatured,
-          articles: defaultList
-        }
-      }
-
-      const mapped = snapshot.docs.map<ArticleCard>((doc) => {
-        const data = doc.data()
-        const publishedAtRaw = data.publishedAt
-        const publishedAt =
-          publishedAtRaw instanceof Timestamp
-            ? publishedAtRaw.toDate()
-            : typeof publishedAtRaw === 'number'
-              ? new Date(publishedAtRaw)
-              : publishedAtRaw
-
-        const readMinutes = data.readMinutes ?? data.readTime ?? 6
-        const link =
-          data.link ??
-          (data.slug ? `/articles/${data.slug}` : data.slug === undefined ? '#' : String(data.slug))
-
-        return {
-          id: doc.id,
-          title: data.title ?? 'Untitled article',
-          dateLabel: formatDate(publishedAt) || 'TBD',
-          readTime: typeof readMinutes === 'number' ? `${readMinutes} min read` : String(readMinutes),
-          excerpt: data.excerpt ?? 'Summary coming soon.',
-          tags: Array.isArray(data.tags) ? data.tags : [],
-          link,
-          featured: Boolean(data.featured)
-        }
-      })
-
-      const featuredArticle = mapped.find((item) => item.featured) ?? mapped[0]
-      const remaining = mapped.filter((item) => item.id !== featuredArticle.id)
-
-      return {
-        featured: featuredArticle,
-        articles: remaining
-      }
-    } catch (err) {
-      console.warn('[articles] Firestore fetch failed, falling back to static content.', err)
-      return {
-        featured: defaultFeatured,
-        articles: defaultList
-      }
-    }
-  },
-  {
-    server: false,
-    default: () => ({
-      featured: defaultFeatured,
-      articles: defaultList
-    })
+const loadArticles = async () => {
+  isLoading.value = true
+  if (!$firebaseFirestore) {
+    isLoading.value = false
+    hasError.value = true
+    return
   }
-)
 
-const featuredArticle = computed(() => articlesData.value?.featured ?? defaultFeatured)
-const otherArticles = computed(() => articlesData.value?.articles ?? defaultList)
-const isLoading = computed(() => pending.value)
-const hasError = computed(() => Boolean(error.value))
+  try {
+    const snapshot = await getDocs(
+      query(collection($firebaseFirestore, 'articles'), orderBy('publishedAt', 'desc'))
+    )
+
+    if (snapshot.empty) {
+      return
+    }
+
+    const mapped = snapshot.docs.map<ArticleCard>((doc) => {
+      const data = doc.data()
+      const publishedAtRaw = data.publishedAt
+      const publishedAt =
+        publishedAtRaw instanceof Timestamp
+          ? publishedAtRaw.toDate()
+          : typeof publishedAtRaw === 'number'
+            ? new Date(publishedAtRaw)
+            : publishedAtRaw
+
+      const readMinutes = data.readMinutes ?? data.readTime ?? 6
+      const link =
+        data.link ??
+        (data.slug ? `/articles/${data.slug}` : `/articles/${doc.id}`)
+
+      return {
+        id: doc.id,
+        title: data.title ?? 'Untitled article',
+        dateLabel: formatDate(publishedAt) || 'TBD',
+        readTime: typeof readMinutes === 'number' ? `${readMinutes} min read` : String(readMinutes),
+        excerpt: data.excerpt ?? 'Summary coming soon.',
+        tags: Array.isArray(data.tags) ? data.tags : [],
+        link,
+        featured: Boolean(data.featured)
+      }
+    })
+
+    const nextFeatured = mapped.find((item) => item.featured) ?? mapped[0]
+    const remaining = mapped.filter((item) => item.id !== nextFeatured.id)
+
+    featuredArticle.value = nextFeatured
+    otherArticles.value = remaining
+    hasError.value = false
+  } catch (err) {
+    console.warn('[articles] Firestore fetch failed, falling back to static content.', err)
+    hasError.value = true
+  } finally {
+    isLoading.value = false
+  }
+}
+
+if (process.client) {
+  loadArticles()
+}
 </script>
 
 <template>
@@ -276,11 +265,18 @@ const hasError = computed(() => Boolean(error.value))
 
     <section class="rounded-[2.5rem] border border-dashed border-slate-300/70 bg-white/70 p-8 text-sm text-slate-600">
       <h2 class="text-base font-semibold text-slate-900">
-        Coming soon: Live articles from Firestore
+        Managed in Firebase
       </h2>
       <p class="mt-3 leading-6">
-        I’m wiring this section to Firebase Firestore next so posts publish straight from my writing workflow.
-        The Firebase config is loaded client-side and ready for the collection hookup.
+        Add or edit documents in the <code>articles</code> collection (fields: <code>title</code>, <code>excerpt</code>,
+        <code>publishedAt</code>, <code>readMinutes</code>, <code>tags</code>, optional <code>slug</code>, <code>body</code>) and
+        they’ll appear here instantly—no deploy needed.
+      </p>
+      <p
+        v-if="hasError"
+        class="mt-3 inline-flex items-center gap-2 rounded-full bg-amber-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700"
+      >
+        Sync issue — showing fallback posts
       </p>
     </section>
   </div>
