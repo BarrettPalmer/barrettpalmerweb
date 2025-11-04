@@ -35,9 +35,9 @@ const onProfileImageError = () => {
 </script>
 
 <template>
-  <section class="grid items-start gap-12 lg:grid-cols-[1.4fr_minmax(0,0.75fr)] lg:items-stretch lg:gap-16">
+  <section class="mx-auto max-w-3xl">
     <article class="relative rounded-[2.75rem] border border-white/60 bg-white/80 p-10 shadow-soft backdrop-blur-xl lg:p-12">
-      <div class="absolute -top-6 left-8 hidden h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg lg:block">
+      <div class="absolute -top-8 left-1/2 hidden h-24 w-24 -translate-x-1/2 overflow-hidden rounded-full border-4 border-white shadow-lg lg:block">
         <img
           :src="profileImage"
           alt="Barrett Palmer"
@@ -46,18 +46,14 @@ const onProfileImageError = () => {
         >
       </div>
 
-      <div class="flex flex-col gap-10">
-        <div class="flex flex-col gap-6">
-          <div class="flex items-center justify-between text-sm font-medium text-slate-500">
-            <span class="hidden items-center gap-2 rounded-pill border border-slate-200 px-3 py-1 lg:flex">
+      <div class="flex flex-col gap-10 pt-4 lg:pt-8">
+        <div class="flex flex-col gap-6 text-center lg:text-left">
+          <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-medium text-slate-500 lg:justify-between">
+            <span class="flex items-center gap-2 rounded-pill border border-slate-200 px-3 py-1">
               <span class="h-2 w-2 rounded-full bg-emerald-500" />
               Available for new projects
             </span>
-            <button
-              type="button"
-              class="ml-auto flex items-center gap-2 rounded-pill border border-slate-200 px-3 py-1 text-slate-500 hover:border-slate-300 hover:text-slate-700"
-            >
-              <span class="sr-only">Toggle theme</span>
+            <span class="hidden lg:flex items-center gap-2 rounded-pill border border-slate-200 px-3 py-1 text-slate-500">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4">
                 <path
                   stroke-linecap="round"
@@ -66,37 +62,29 @@ const onProfileImageError = () => {
                   d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
                 />
               </svg>
-            </button>
+              Always iterating
+            </span>
           </div>
 
-          <div class="flex items-start gap-5 lg:hidden">
-            <img
-              :src="profileImage"
-              alt="Barrett Palmer"
-              class="h-14 w-14 flex-none rounded-full object-cover"
-              @error="onProfileImageError"
-            >
-            <div>
-              <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                Co-founder, CEO, and full-stack security engineer.
-              </h1>
-              <p class="mt-4 text-base text-slate-600 sm:text-lg">
-                I’m Barrett Palmer, the co-founder and CEO of EntrustMyLife LLC. I architect systems across iOS, Android, and the web—always obsessing over security, scale, and the people using them.
-              </p>
+          <div class="flex flex-col gap-5">
+            <div class="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-lg lg:hidden">
+              <img
+                :src="profileImage"
+                alt="Barrett Palmer"
+                class="h-full w-full object-cover"
+                @error="onProfileImageError"
+              >
             </div>
-          </div>
-
-          <div class="hidden lg:block">
-            <h1 class="max-w-xl text-5xl font-extrabold tracking-tight text-slate-900">
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl lg:leading-snug">
               Building secure, human-centered platforms that earn trust.
             </h1>
-            <p class="mt-6 max-w-xl text-lg leading-8 text-slate-600">
-              I lead EntrustMyLife LLC, where I write code every day, prototype with Nuxt.js, and ship products that solve real problems. From Google Cloud and Firebase orchestration to resilient mobile apps, every build is grounded in hands-on engineering.
+            <p class="text-base text-slate-600 sm:text-lg lg:text-left">
+              I’m Barrett Palmer, co-founder and CEO of EntrustMyLife LLC. I architect systems across iOS, Android, and the web—writing code every day, leaning on Nuxt.js for resilient interfaces, and orchestrating on Google Cloud and Firebase so teams can move fast without sacrificing security.
             </p>
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-4 text-slate-500">
+        <div class="flex flex-wrap justify-center gap-4 text-slate-500 lg:justify-start">
           <a
             href="#"
             class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/70 transition hover:border-transparent hover:bg-slate-900 hover:text-white"
@@ -155,90 +143,6 @@ const onProfileImageError = () => {
         </div>
       </div>
     </article>
-
-    <aside class="relative flex items-start justify-center lg:justify-end">
-      <div class="relative w-full max-w-sm rounded-[2.5rem] border border-white/60 bg-white/80 p-8 shadow-soft backdrop-blur-xl">
-        <div class="flex items-center justify-between text-sm text-slate-500">
-          <button type="button" class="rounded-pill border border-slate-200 px-3 py-1">
-            Menu
-          </button>
-          <button type="button" class="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200">
-            <span class="sr-only">Toggle theme</span>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div class="mt-8 flex flex-col gap-6 text-center text-slate-600">
-          <div class="mx-auto h-20 w-20 overflow-hidden rounded-full border-4 border-white shadow-lg">
-            <img
-              :src="profileImage"
-              alt="Barrett Palmer"
-              class="h-full w-full object-cover"
-              @error="onProfileImageError"
-            >
-          </div>
-
-          <div>
-            <h2 class="text-2xl font-bold text-slate-900">
-              Founder, operator, and teacher.
-            </h2>
-            <p class="mt-4 text-sm leading-6">
-              I write books, launch products, and mentor leaders to ship with confidence. Every experiment—from Squeeze Bras to my upcoming Planning Center platform—leans on secure architecture and relentless iteration.
-            </p>
-          </div>
-
-          <div class="flex items-center justify-center gap-4 text-slate-500">
-            <span class="sr-only">Social links</span>
-            <a href="#" class="transition hover:text-slate-900" aria-label="Twitter small">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.6"
-                  d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0012 7.47v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"
-                />
-              </svg>
-            </a>
-            <a href="#" class="transition hover:text-slate-900" aria-label="Instagram small">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke-width="1.6" />
-                <path stroke-width="1.6" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" />
-                <path d="M17.5 6.5h.01" stroke-linecap="round" stroke-width="2" />
-              </svg>
-            </a>
-            <a href="#" class="transition hover:text-slate-900" aria-label="GitHub small">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.6"
-                  d="M9 19c-5 1-5-2-7-2m14 4v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77 5.44 5.44 0 003.5 7.52c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 17.13V21"
-                />
-              </svg>
-            </a>
-            <a href="#" class="transition hover:text-slate-900" aria-label="LinkedIn small">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.6"
-                  d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 10-4 0v7h-4v-7a6 6 0 016-6z"
-                />
-                <rect x="2" y="9" width="4" height="12" stroke-width="1.6" />
-                <path d="M4 4a2 2 0 110 4 2 2 0 010-4z" stroke-width="1.6" />
-              </svg>
-            </a>
-          </div>
-        </div>
-      </div>
-    </aside>
   </section>
 
   <section class="mt-20">
