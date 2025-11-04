@@ -7,7 +7,6 @@
         <NuxtLink to="/about" class="transition hover:text-slate-900">About</NuxtLink>
         <NuxtLink to="/articles" class="transition hover:text-slate-900">Articles</NuxtLink>
         <NuxtLink to="/projects" class="transition hover:text-slate-900">Projects</NuxtLink>
-        <NuxtLink to="/speaking" class="transition hover:text-slate-900">Speaking</NuxtLink>
         <NuxtLink to="/uses" class="transition hover:text-slate-900">Uses</NuxtLink>
       </div>
     </div>
