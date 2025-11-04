@@ -25,24 +25,12 @@ const photos = [
 const fallbackProfileImage =
   'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80'
 const localProfileImage = '/images/barrett-palmer.jpg'
-const profileImage = ref(fallbackProfileImage)
-
-const promoteLocalProfileImage = () => {
-  if (profileImage.value !== localProfileImage) {
-    profileImage.value = localProfileImage
-  }
-}
-
-if (process.client) {
-  const tester = new Image()
-  tester.src = localProfileImage
-  tester.onload = () => {
-    promoteLocalProfileImage()
-  }
-}
+const profileImage = ref(localProfileImage)
 
 const onProfileImageError = () => {
-  profileImage.value = fallbackProfileImage
+  if (profileImage.value !== fallbackProfileImage) {
+    profileImage.value = fallbackProfileImage
+  }
 }
 </script>
 
