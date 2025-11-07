@@ -12,58 +12,6 @@ interface ArticleCard {
   featured?: boolean
 }
 
-const fallbackArticles: ArticleCard[] = [
-  {
-    id: 'fallback-featured',
-    title: 'Shipping secure systems without shipping fear',
-    dateLabel: 'Dec 12, 2024',
-    readTime: '9 min read',
-    excerpt: 'Patterns I lean on at EntrustMyLife to keep iOS, Android, and web teams confident while hardening their platforms.',
-    tags: ['Security', 'Leadership'],
-    link: '#',
-    featured: true
-  },
-  {
-    id: 'fallback-1',
-    title: 'What Amazon FBA taught me about velocity',
-    dateLabel: 'Oct 25, 2024',
-    readTime: '6 min read',
-    excerpt: 'The Squeeze Bras launch hit #1 fast, but the real lesson was codifying ops in automation-friendly playbooks.',
-    tags: ['Growth', 'Automation'],
-    link: '#'
-  },
-  {
-    id: 'fallback-2',
-    title: 'Choosing Firebase when security matters',
-    dateLabel: 'Aug 18, 2024',
-    readTime: '7 min read',
-    excerpt: 'Why I back Google Cloud and Firebase for reliability, and where I draw the line compared to AWS.',
-    tags: ['Security', 'Architecture'],
-    link: '#'
-  },
-  {
-    id: 'fallback-3',
-    title: 'Leading from the console',
-    dateLabel: 'May 9, 2024',
-    readTime: '8 min read',
-    excerpt: 'Book two in progress: frameworks for leaders who need to stay hands-on with their code and their teams.',
-    tags: ['Leadership'],
-    link: '#'
-  },
-  {
-    id: 'fallback-4',
-    title: 'Designing with the Composition API',
-    dateLabel: 'Mar 14, 2024',
-    readTime: '5 min read',
-    excerpt: 'How Nuxt’s Composition API keeps my components honest and testable—even when the stack spans multiple apps.',
-    tags: ['Nuxt.js', 'Engineering'],
-    link: '#'
-  }
-]
-
-const defaultFeatured = fallbackArticles[0]
-const defaultList = fallbackArticles.slice(1)
-
 const { $firebaseFirestore } = useNuxtApp()
 
 const formatDate = (value: Date | string | null | undefined) => {
@@ -79,16 +27,16 @@ const formatDate = (value: Date | string | null | undefined) => {
   }).format(date)
 }
 
-const featuredArticle = ref<ArticleCard>(defaultFeatured)
-const otherArticles = ref<ArticleCard[]>(defaultList)
+const featuredArticle = ref<ArticleCard | null>(null)
+const otherArticles = ref<ArticleCard[]>([])
 const isLoading = ref(true)
 const hasError = ref(false)
 
 const loadArticles = async () => {
   isLoading.value = true
   if (!$firebaseFirestore) {
-    isLoading.value = false
     hasError.value = true
+    isLoading.value = false
     return
   }
 
@@ -98,6 +46,9 @@ const loadArticles = async () => {
     )
 
     if (snapshot.empty) {
+      hasError.value = true
+      featuredArticle.value = null
+      otherArticles.value = []
       return
     }
 
@@ -137,14 +88,16 @@ const loadArticles = async () => {
   } catch (err) {
     console.warn('[articles] Firestore fetch failed, falling back to static content.', err)
     hasError.value = true
+    featuredArticle.value = null
+    otherArticles.value = []
   } finally {
     isLoading.value = false
   }
 }
 
-if (process.client) {
+onMounted(() => {
   loadArticles()
-}
+})
 </script>
 
 <template>
@@ -186,27 +139,31 @@ if (process.client) {
           </span>
           <span class="text-sm text-slate-500">
             <span v-if="isLoading">Loading…</span>
-            <template v-else>
+            <template v-else-if="featuredArticle">
               {{ featuredArticle.dateLabel }} · {{ featuredArticle.readTime }}
             </template>
           </span>
         </div>
         <h2 class="mt-4 text-2xl font-semibold text-slate-900">
           <span v-if="isLoading" class="block h-7 w-3/4 animate-pulse rounded-full bg-slate-200" />
-          <template v-else>
+          <template v-else-if="featuredArticle">
             {{ featuredArticle.title }}
           </template>
         </h2>
         <p class="mt-3 text-base leading-7 text-slate-600">
           <span v-if="isLoading" class="block h-5 w-full animate-pulse rounded-full bg-slate-200" />
           <span v-if="isLoading" class="mt-2 block h-5 w-5/6 animate-pulse rounded-full bg-slate-200" />
-          <template v-else>
+          <template v-else-if="featuredArticle">
             {{ featuredArticle.excerpt }}
           </template>
+          <span v-else class="text-sm text-slate-500">
+            No published articles yet. Add one in Firestore and refresh.
+          </span>
         </p>
         <NuxtLink
-          :to="isLoading ? '#' : featuredArticle.link || '#'"
+          :to="isLoading || !featuredArticle ? '#' : featuredArticle.link || '#'"
           class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-900 transition hover:gap-3"
+          :class="{ 'pointer-events-none opacity-40': isLoading || !featuredArticle }"
         >
           Read the story
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4">
@@ -217,23 +174,6 @@ if (process.client) {
     </section>
 
     <section class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-      <article
-        v-if="isLoading"
-        class="rounded-[2rem] border border-white/60 bg-white/80 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur"
-      >
-        <div class="flex items-center justify-between text-xs text-slate-400">
-          <span class="block h-4 w-1/3 animate-pulse rounded-full bg-slate-200" />
-          <span class="block h-4 w-16 animate-pulse rounded-full bg-slate-200" />
-        </div>
-        <div class="mt-4 h-6 w-3/4 animate-pulse rounded-full bg-slate-200" />
-        <div class="mt-3 h-4 w-full animate-pulse rounded-full bg-slate-200" />
-        <div class="mt-2 h-4 w-5/6 animate-pulse rounded-full bg-slate-200" />
-        <div class="mt-4 flex gap-2">
-          <span class="block h-6 w-16 animate-pulse rounded-full bg-slate-200" />
-          <span class="block h-6 w-20 animate-pulse rounded-full bg-slate-200" />
-        </div>
-      </article>
-
       <article
         v-for="article in otherArticles"
         :key="article.id"
@@ -261,9 +201,41 @@ if (process.client) {
           </span>
         </div>
       </article>
+
+      <article
+        v-if="isLoading && !otherArticles.length"
+        class="rounded-[2rem] border border-white/60 bg-white/80 p-7 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur"
+      >
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span class="block h-4 w-1/3 animate-pulse rounded-full bg-slate-200" />
+          <span class="block h-4 w-16 animate-pulse rounded-full bg-slate-200" />
+        </div>
+        <div class="mt-4 h-6 w-3/4 animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-3 h-4 w-full animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-2 h-4 w-5/6 animate-pulse rounded-full bg-slate-200" />
+        <div class="mt-4 flex gap-2">
+          <span class="block h-6 w-16 animate-pulse rounded-full bg-slate-200" />
+          <span class="block h-6 w-20 animate-pulse rounded-full bg-slate-200" />
+        </div>
+      </article>
     </section>
 
-    <section class="rounded-[2.5rem] border border-dashed border-slate-300/70 bg-white/70 p-8 text-sm text-slate-600">
+    <section
+      v-if="!isLoading && !featuredArticle"
+      class="rounded-[2.5rem] border border-dashed border-slate-300/70 bg-white/70 p-8 text-sm text-slate-600"
+    >
+      <h2 class="text-base font-semibold text-slate-900">
+        No live articles yet
+      </h2>
+      <p class="mt-3 leading-6">
+        Add your first document to the <code>articles</code> collection and refresh this page to see it here.
+      </p>
+    </section>
+
+    <section
+      v-else
+      class="rounded-[2.5rem] border border-dashed border-slate-300/70 bg-white/70 p-8 text-sm text-slate-600"
+    >
       <h2 class="text-base font-semibold text-slate-900">
         Managed in Firebase
       </h2>

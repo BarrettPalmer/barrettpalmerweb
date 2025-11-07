@@ -1,24 +1,20 @@
 <script setup lang="ts">
 const photos = [
   {
-    src: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=800&q=80',
     alt: 'Cockpit view from a small aircraft'
   },
   {
-    src: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80',
     alt: 'Speaker presenting at a conference'
   },
   {
-    src: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1483058712412-4245e9b90334?auto=format&fit=crop&w=800&q=80',
     alt: 'Minimal desktop workspace'
   },
   {
-    src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=600&q=80',
+    src: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80',
     alt: 'Mountain landscape above the clouds'
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1526481280695-3c46917b26b6?auto=format&fit=crop&w=600&q=80',
-    alt: 'Mars-like desert canyon'
   }
 ]
 
@@ -35,9 +31,12 @@ const onProfileImageError = () => {
 </script>
 
 <template>
-  <section class="mx-auto max-w-3xl">
-    <article class="relative rounded-[2.75rem] border border-white/60 bg-white/80 p-10 shadow-soft backdrop-blur-xl lg:p-12">
-      <div class="absolute -top-8 left-1/2 hidden h-24 w-24 -translate-x-1/2 overflow-hidden rounded-full border-4 border-white shadow-lg lg:block">
+  <section class="mx-auto max-w-5xl">
+    <article class="relative overflow-hidden rounded-[3rem] border border-white/70 bg-white/80 p-10 shadow-[0_50px_120px_rgba(15,23,42,0.08)] backdrop-blur-xl lg:p-16">
+      <div class="absolute -top-24 right-24 hidden h-64 w-64 rounded-full bg-gradient-to-br from-sky-100 via-white to-transparent blur-3xl lg:block" />
+      <div class="absolute -top-40 left-32 hidden h-72 w-72 rounded-full bg-gradient-to-br from-indigo-100 via-white to-transparent blur-3xl lg:block" />
+
+      <div class="absolute -top-12 left-1/2 hidden h-28 w-28 -translate-x-1/2 overflow-hidden rounded-full border border-white/70 shadow-[0_15px_40px_rgba(15,23,42,0.15)] lg:block">
         <img
           :src="profileImage"
           alt="Barrett Palmer"
@@ -46,42 +45,25 @@ const onProfileImageError = () => {
         >
       </div>
 
-      <div class="flex flex-col gap-10 pt-4 lg:pt-8">
+      <div class="flex flex-col gap-12 pt-4 lg:pt-12">
         <div class="flex flex-col gap-6 text-center lg:text-left">
-          <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-medium text-slate-500 lg:justify-between">
-            <span class="flex items-center gap-2 rounded-pill border border-slate-200 px-3 py-1">
-              <span class="h-2 w-2 rounded-full bg-emerald-500" />
-              Available for new projects
-            </span>
-            <span class="hidden lg:flex items-center gap-2 rounded-pill border border-slate-200 px-3 py-1 text-slate-500">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-4 w-4">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.5"
-                  d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364 6.364-1.414-1.414M7.05 7.05 5.636 5.636m12.728 0-1.414 1.414M7.05 16.95l-1.414 1.414M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              Always iterating
-            </span>
+          <div class="mx-auto flex h-24 w-24 items-center justify-center overflow-hidden rounded-full border border-white/70 shadow-[0_12px_30px_rgba(15,23,42,0.12)] lg:hidden">
+            <img
+              :src="profileImage"
+              alt="Barrett Palmer"
+              class="h-full w-full object-cover"
+              @error="onProfileImageError"
+            >
           </div>
-
-          <div class="flex flex-col gap-5">
-            <div class="mx-auto flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border-4 border-white shadow-lg lg:hidden">
-              <img
-                :src="profileImage"
-                alt="Barrett Palmer"
-                class="h-full w-full object-cover"
-                @error="onProfileImageError"
-              >
-            </div>
-            <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl lg:leading-snug">
-              Building secure, human-centered platforms that earn trust.
-            </h1>
-            <p class="text-base text-slate-600 sm:text-lg lg:text-left">
-              I’m Barrett Palmer, co-founder and CEO of EntrustMyLife LLC. I architect systems across iOS, Android, and the web—writing code every day, leaning on Nuxt.js for resilient interfaces, and orchestrating on Google Cloud and Firebase so teams can move fast without sacrificing security.
-            </p>
-          </div>
+          <p class="text-sm font-semibold uppercase tracking-[0.35em] text-slate-400">
+            EntrustMyLife LLC
+          </p>
+          <h1 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            Secure experiences designed with the calm finesse of great hardware.
+          </h1>
+          <p class="text-lg leading-8 text-slate-600 sm:text-xl">
+            I’m Barrett Palmer—founder, engineer, and systems thinker. I build products that feel effortless on the surface and are obsessively secure underneath, spanning iOS, Android, and the web. Nuxt.js, Google Cloud, and Firebase power the foundation so teams can operate with Apple-grade polish.
+          </p>
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 text-slate-500 lg:justify-start">
@@ -147,20 +129,19 @@ const onProfileImageError = () => {
 
   <section class="mt-20">
     <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-slate-400">
-      Recent experiments
+      Recent explorations
     </h2>
     <p class="mt-4 max-w-2xl text-lg text-slate-600">
-      Moments from scaling consumer brands, architecting secure stacks, and staying curious about where tech can take us next.
+      A small gallery from the build—prototyping, launches, and the leadership moments that keep the mission grounded.
     </p>
 
-    <div class="mt-10 flex gap-6 overflow-x-auto pb-4">
+    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       <div
         v-for="photo in photos"
         :key="photo.src"
-        class="relative flex-none overflow-hidden rounded-[2rem] shadow-xl shadow-slate-900/20 transition hover:-translate-y-1 hover:shadow-2xl"
-        style="width: 220px; height: 260px;"
+        class="group relative overflow-hidden rounded-[2rem] border border-white/80 bg-white shadow-[0_25px_60px_rgba(15,23,42,0.12)] transition hover:-translate-y-1 hover:shadow-[0_35px_90px_rgba(15,23,42,0.15)]"
       >
-        <img :src="photo.src" :alt="photo.alt" class="h-full w-full object-cover">
+        <img :src="photo.src" :alt="photo.alt" class="h-64 w-full object-cover transition duration-700 group-hover:scale-105">
       </div>
     </div>
   </section>
