@@ -78,6 +78,7 @@ watch(
                 :to="item.href"
                 class="block rounded-2xl px-4 py-3 transition hover:bg-slate-100 hover:text-slate-900"
                 :class="route.path === item.href ? 'bg-slate-100 text-slate-900' : ''"
+                @click="mobileOpen = false"
               >
                 {{ item.label }}
               </NuxtLink>
